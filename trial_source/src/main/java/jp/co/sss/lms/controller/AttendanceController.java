@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import jakarta.servlet.http.HttpSession;
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
@@ -40,16 +41,28 @@ public class AttendanceController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
-	public String index(Model model) {
+	public String index(HttpSession session, Model model) {
 
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
+		
+		Boolean hasShown = (Boolean) session.getAttribute("hasUnfilledShown");
+		if(hasShown == null|| !hasShown) {
+		boolean hasUnfilled = studentAttendanceService.hasUnfilledPastAttendance(
+				loginUserDto.getLmsUserId(),
+				loginUserDto.getCourseId()
+				);
+		model.addAttribute("hasUnfilled", hasUnfilled);
+		session.setAttribute("hasUnfilledShown", true);
+		}else {
+			model.addAttribute("hasUnfilled", false);
+		}
 
 		return "attendance/detail";
 	}
-
+	
 	/**
 	 * 勤怠管理画面 『出勤』ボタン押下
 	 * 
@@ -119,6 +132,7 @@ public class AttendanceController {
 
 		return "attendance/update";
 	}
+
 
 	/**
 	 * 勤怠情報直接変更画面 『更新』ボタン押下

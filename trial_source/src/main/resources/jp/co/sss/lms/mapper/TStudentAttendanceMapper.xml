@@ -18,6 +18,31 @@
 			AND training_date = #{trainingDate} 
 			AND delete_flg = #{deleteFlg}
 	</select>
+	
+	<select id="countUnfilledPastAttendance" resultType="int">
+    SELECT COUNT(*)
+    FROM t_student_attendance sa
+    INNER JOIN t_course_user cu
+      ON sa.lms_user_id = cu.lms_user_id
+    INNER JOIN m_course c
+      ON cu.course_id = c.course_id
+    WHERE sa.lms_user_id = #{lmsUserId}
+      AND cu.course_id   = #{courseId}
+      AND sa.delete_flg  = 0
+      AND cu.delete_flg  = 0
+      AND c.delete_flg   = 0
+     
+     
+      AND sa.training_date BETWEEN DATE(c.open_time) AND DATE(c.close_time)
+      
+      AND sa.training_date &lt; CURRENT_DATE
+      
+      AND (sa.training_start_time IS NULL OR TRIM(sa.training_start_time) = ''
+           OR sa.training_end_time IS NULL OR TRIM(sa.training_end_time) = '')
+</select>
+
+
+	
 
 	<select id="getAttendanceManagement" resultType="jp.co.sss.lms.dto.AttendanceManagementDto">
 		SELECT
@@ -39,6 +64,8 @@
 			AND t1.delete_flg = #{deleteFlg}
 		ORDER BY t2.date ASC
 	</select>
+	
+	
 
 	<insert id="insert" parameterType="jp.co.sss.lms.entity.TStudentAttendance" useGeneratedKeys="true" keyProperty="studentAttendanceId">
 		INSERT INTO t_student_attendance 

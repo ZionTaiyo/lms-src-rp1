@@ -72,6 +72,16 @@ public class StudentAttendanceService {
 
 		return attendanceManagementDtoList;
 	}
+	
+	/**
+	 * 未入力勤怠チェック
+	 * 
+	 * @param lmsUserId
+	 * @return 勤怠情報（受講生）テーブルマッパー
+	 */
+	public boolean hasUnfilledPastAttendance(int lmsUserId, int courseId) {
+		return tStudentAttendanceMapper.countUnfilledPastAttendance(lmsUserId, courseId) > 0;
+	}
 
 	/**
 	 * 出退勤更新前のチェック
