@@ -39,6 +39,7 @@
       
       AND (sa.training_start_time IS NULL OR TRIM(sa.training_start_time) = ''
            OR sa.training_end_time IS NULL OR TRIM(sa.training_end_time) = '')
+           AND EXTRACT(DOW FROM sa.training_date)NOT IN (0,6)
 </select>
 
 
@@ -62,6 +63,7 @@
 			LEFT OUTER JOIN t_student_attendance t3 ON t3.lms_user_id = #{lmsUserId} AND cast(t2.date AS DATE) = cast(t3.training_date AS DATE)
 		WHERE t1.course_id = #{courseId} 
 			AND t1.delete_flg = #{deleteFlg}
+			AND EXTRACT(DOW FROM t2.date) NOT IN(0,6)
 		ORDER BY t2.date ASC
 	</select>
 	

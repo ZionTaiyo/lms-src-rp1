@@ -146,5 +146,34 @@ public class AttendanceUtil {
 		}
 		return false;
 	}
+	/**
+	 * 時間プルダウン
+	 * 
+	 * @return 時間
+	 */
+	public LinkedHashMap<String, String>setHours(){
+		LinkedHashMap<String, String>map = new LinkedHashMap<>();
+		map.put("", "");
+		for(int i = 0; i < 24; i++) {
+			String val = String.format("%02d", i);
+			map.put(val, val);
+		}
+		return map;
+	}
+	/**
+	 * 分プルダウン
+	 * 
+	 * @return 分
+	 */
+	public LinkedHashMap<String, String>setMinutes(){
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		map.put("","");
+		for(int i = 0; i< 60; i++) {
+			String val = String.format("%02d", i);
+			map.put(val,val);
+		}
+		return map;
+		
+	}
 
 }
