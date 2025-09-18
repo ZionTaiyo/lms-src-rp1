@@ -7,10 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
@@ -144,9 +146,21 @@ public class AttendanceController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(path = "/update", params = "complete", method = RequestMethod.POST)
-	public String complete(AttendanceForm attendanceForm, Model model, BindingResult result)
+	public String complete(@Valid @ModelAttribute AttendanceForm attendanceForm, Model model, BindingResult result)
 			throws ParseException {
+		
+	    // サービス側で行ごとの相関チェックを行う（bindingResult にエラーを追加）
+	    for (int i = 0; i < attendanceForm.getAttendanceList().size(); i++) {
+	        studentAttendanceService.validateAttendance(attendanceForm.getAttendanceList().get(i), result, i);
+	    }
 
+	    if (result.hasErrors()) {
+	        // 戻すときはプルダウン等の選択肢を再セット（画面で必要）
+	        studentAttendanceService.populateFormOptions(attendanceForm);
+	        model.addAttribute("attendanceForm", attendanceForm);
+	        return "attendance/update";
+	    
+	    }
 		// 更新
 		String message = studentAttendanceService.update(attendanceForm);
 		model.addAttribute("message", message);
