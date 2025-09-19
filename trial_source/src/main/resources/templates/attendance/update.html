@@ -23,11 +23,11 @@
 		<div class="bs-component col-sm-12">
 
 			<form th:action="@{/attendance/update}" method="post">
-				<div th:if="${validationErrors}" class="alert alert-danger">
-					<ul>
-						<li th:each="err : ${validationErrors}" th:text="*${err.defaultMessage}"></li>
+				<th:block th:if="${not #strings.isEmpty(error)}" id="error">
+					<ul style="padding-left: 0; list-style: none;">
+						<li><span th:utext="${error}" class="help-inline error"></span></li>
 					</ul>
-				</div>
+				</th:block>
 				
 				<table class="table table-hover dataTable no-footer">
 					<thead>
@@ -126,13 +126,19 @@
 					<th:block th:if="${session.loginUserDto.role != '0001'}">
 						<input type="submit" value="戻る" name="indexCompany" class="btn btn-default" />
 					</th:block>
-					<input type="submit" value="更新" name="complete" class="btn btn-info" />
+					<input type="submit" value="更新" name="complete" class="btn btn-info" 
+					onclick="return registCheck();" />
 				</div>
 
 			</form>
 		</div>
 	</div>
-
+<script>
+	function registCheck(){
+		return confirm("更新します。よろしいですか？");
+		}
+		</script>
+      
 </body>
 
 </html>
