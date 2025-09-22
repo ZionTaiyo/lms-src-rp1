@@ -53,9 +53,12 @@ public interface TStudentAttendanceMapper {
 	 * 過去日勤怠未入力通知
 	 * 
 	 * @param lmsUserId
+	 * @param deleteFlg
+	 * @param trainingDate
 	 * @return 未入力通知
 	 */
-	int countUnfilledPastAttendance(@Param("lmsUserId") int lmsUserId, @Param("courseId") int courseId);
+	int countUnfilledPastAttendance(@Param("lmsUserId") int lmsUserId,@Param("deleteFlg") short deleteFlg,
+			@Param("trainingDate") Date trainingDate);
 	
 
 	/**

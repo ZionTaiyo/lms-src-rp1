@@ -22,24 +22,14 @@
 	<select id="countUnfilledPastAttendance" resultType="int">
     SELECT COUNT(*)
     FROM t_student_attendance sa
-    INNER JOIN t_course_user cu
-      ON sa.lms_user_id = cu.lms_user_id
-    INNER JOIN m_course c
-      ON cu.course_id = c.course_id
     WHERE sa.lms_user_id = #{lmsUserId}
-      AND cu.course_id   = #{courseId}
-      AND sa.delete_flg  = 0
-      AND cu.delete_flg  = 0
-      AND c.delete_flg   = 0
-     
-     
-      AND sa.training_date BETWEEN DATE(c.open_time) AND DATE(c.close_time)
-      
-      AND sa.training_date &lt; CURRENT_DATE
-      
-      AND (sa.training_start_time IS NULL OR TRIM(sa.training_start_time) = ''
-           OR sa.training_end_time IS NULL OR TRIM(sa.training_end_time) = '')
-           AND EXTRACT(DOW FROM sa.training_date)NOT IN (0,6)
+      AND sa.delete_flg  = #{deleteFlg}
+      AND sa.training_date &lt; #{trainingDate}
+      AND sa.status != 1
+      AND (
+            sa.training_start_time IS NULL OR TRIM(sa.training_start_time) = ''
+         OR sa.training_end_time   IS NULL OR TRIM(sa.training_end_time)   = ''
+      )
 </select>
 
 
@@ -63,7 +53,6 @@
 			LEFT OUTER JOIN t_student_attendance t3 ON t3.lms_user_id = #{lmsUserId} AND cast(t2.date AS DATE) = cast(t3.training_date AS DATE)
 		WHERE t1.course_id = #{courseId} 
 			AND t1.delete_flg = #{deleteFlg}
-			AND EXTRACT(DOW FROM t2.date) NOT IN(0,6)
 		ORDER BY t2.date ASC
 	</select>
 	

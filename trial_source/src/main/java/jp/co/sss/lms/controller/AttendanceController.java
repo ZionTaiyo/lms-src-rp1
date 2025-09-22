@@ -1,6 +1,7 @@
 package jp.co.sss.lms.controller;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,10 +61,14 @@ public class AttendanceController {
 		
 		Boolean hasShown = (Boolean) session.getAttribute("hasUnfilledShown");
 		if(hasShown == null|| !hasShown) {
+			//今日の日付を取得
+			Date today = new Date();
 		boolean hasUnfilled = studentAttendanceService.hasUnfilledPastAttendance(
 				loginUserDto.getLmsUserId(),
-				loginUserDto.getCourseId()
+				Constants.DB_FLG_FALSE,
+				today
 				);
+		
 		model.addAttribute("hasUnfilled", hasUnfilled);
 		session.setAttribute("hasUnfilledShown", true);
 		}else {

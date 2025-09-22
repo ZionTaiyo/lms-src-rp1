@@ -29,19 +29,21 @@
 					</ul>
 				</th:block>
 				
-				<table class="table table-hover dataTable no-footer">
-					<thead>
+			
+				<table class="table table-hover dataTable no-footer" style="border-collapse: collapse; table-layout: fixed; width:100%">
+					<thead style="display: block;">
 						<tr>
 							<th class="w140">日付</th>
-							<th class="w300">コース内容</th>
+							<th class="w250">コース内容</th>
+							<th class="w70"></th>
 							<th class="w70">出勤</th>
 							<th class="w70">退勤</th>
 							<th class="w80">中抜け時間</th>
 							<th class="w70">ステータス</th>
-							<th class="w240">備考</th>
+							<th class="w210">備考</th>
 						</tr>
-					</thead>
-					<tbody>
+					</thead>		
+				   <tbody style="display: block; overflow-y: auto; height: 280px;">
 						<th:block th:each="dailyAttendanceForm, stat : *{attendanceForm.attendanceList}">
 							<tr>
 								<th:block>
@@ -59,11 +61,16 @@
 										th:value="${dailyAttendanceForm.statusDispName}" />
 								</th:block>
 								<td class="w140">[[${dailyAttendanceForm.dispTrainingDate}]]</td>
-								<td class="w300">[[${dailyAttendanceForm.sectionName}]]</td>
+								<td class="w250">[[${dailyAttendanceForm.sectionName}]]</td>
+								<td class="w70">
+									<!--定時ボタンのセット-->
+									<button type="button" class="btn btn-success default-button"
+										onclick="setDefaultTime(this)">定時</button>
+								</td>
 								<td class="w70">
 									<span style="white-space:nowrap;">
 										<select th:name="|attendanceList[${stat.index}].trainingStartHour|"
-											class="form-control " style="display:inline-block; width:auto;">
+											class="form-control start-hour" style="display:inline-block; width:auto;">
 											<option th:each="h:${attendanceForm.hours}" th:value="${h.key}"
 												th:text="${h.value}"
 												th:selected="${h.key == dailyAttendanceForm.trainingStartHour}">
@@ -71,7 +78,7 @@
 										</select>
 										:
 										<select th:name="|attendanceList[${stat.index}].trainingStartMinute|"
-											class="form-control " style="display:inline-block; width:auto;">
+											class="form-control start-minute" style="display:inline-block; width:auto;">
 											<option th:each="m:${attendanceForm.minutes}" th:value="${m.key}"
 												th:text="${m.value}"
 												th:selected="${m.key == dailyAttendanceForm.trainingStartMinute}">
@@ -83,20 +90,18 @@
 								<td class="w70">
 									<span style="white-space:nowrap;">
 										<select th:name="|attendanceList[${stat.index}].trainingEndHour|"
-											class="form-control" style="display:inline-block; width:auto;">
+											class="form-control end-hour" style="display:inline-block; width:auto;">
 											<option th:each="h:${attendanceForm.hours}" th:value="${h.key}"
 												th:text="${h.value}"
 												th:selected="${h.key == dailyAttendanceForm.trainingEndHour}">
-												[[${trainingStartTime.value}]]
 											</option>
 										</select>
 										:
 										<select th:name="|attendanceList[${stat.index}].trainingEndMinute|"
-											class="form-control" style="display:inline-block; width:auto;">
+											class="form-control end-minute" style="display:inline-block; width:auto;">
 											<option th:each="m:${attendanceForm.minutes}" th:value="${m.key}"
 												th:text="${m.value}"
 												th:selected="${m.key == dailyAttendanceForm.trainingEndMinute}">
-												[[${trainingEndTime.value}]]
 											</option>
 										</select>
 									</span>
@@ -110,7 +115,7 @@
 									</select>
 								</td>
 								<td class="w70">[[${dailyAttendanceForm.statusDispName}]]</td>
-								<td class="w240">
+								<td class="w210">
 									<input type="text" th:name="|attendanceList[${stat.index}].note|"
 										th:value="${dailyAttendanceForm.note}" class="form-control"></input>
 								</td>
@@ -118,6 +123,7 @@
 						</th:block>
 					</tbody>
 				</table>
+				
 
 				<div class="form-group">
 					<th:block th:if="${session.loginUserDto.role == '0001'}">
@@ -126,19 +132,33 @@
 					<th:block th:if="${session.loginUserDto.role != '0001'}">
 						<input type="submit" value="戻る" name="indexCompany" class="btn btn-default" />
 					</th:block>
-					<input type="submit" value="更新" name="complete" class="btn btn-info" 
-					onclick="return registCheck();" />
+					<input type="submit" value="更新" name="complete" class="btn btn-info"
+						onclick="return registCheck();" />
 				</div>
 
 			</form>
 		</div>
 	</div>
-<script>
-	function registCheck(){
-		return confirm("更新します。よろしいですか？");
+	<script>
+		function registCheck() {
+			return confirm("更新します。よろしいですか？");
 		}
-		</script>
-      
+
+		function setDefaultTime(button) {
+			//押された行を特定
+			const row = button.closest("tr");
+
+			//出勤時間(9:00)
+			row.querySelector(".start-hour").value = "09";
+			row.querySelector(".start-minute").value = "00";
+
+			//退勤時間(18:00)
+			row.querySelector(".end-hour").value = "18";
+			row.querySelector(".end-minute").value = "00";
+		}
+
+	</script>
+
 </body>
 
 </html>
