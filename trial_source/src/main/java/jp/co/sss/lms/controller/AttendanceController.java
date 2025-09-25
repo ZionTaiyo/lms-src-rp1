@@ -3,7 +3,6 @@ package jp.co.sss.lms.controller;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -19,7 +19,6 @@ import jakarta.validation.Valid;
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
-import jp.co.sss.lms.form.DailyAttendanceForm;
 import jp.co.sss.lms.service.StudentAttendanceService;
 import jp.co.sss.lms.util.AttendanceUtil;
 import jp.co.sss.lms.util.Constants;
@@ -58,26 +57,25 @@ public class AttendanceController {
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
-		
+
 		Boolean hasShown = (Boolean) session.getAttribute("hasUnfilledShown");
-		if(hasShown == null|| !hasShown) {
+		if (hasShown == null || !hasShown) {
 			//今日の日付を取得
 			Date today = new Date();
-		boolean hasUnfilled = studentAttendanceService.hasUnfilledPastAttendance(
-				loginUserDto.getLmsUserId(),
-				Constants.DB_FLG_FALSE,
-				today
-				);
-		
-		model.addAttribute("hasUnfilled", hasUnfilled);
-		session.setAttribute("hasUnfilledShown", true);
-		}else {
+			boolean hasUnfilled = studentAttendanceService.hasUnfilledPastAttendance(
+					loginUserDto.getLmsUserId(),
+					Constants.DB_FLG_FALSE,
+					today);
+
+			model.addAttribute("hasUnfilled", hasUnfilled);
+			session.setAttribute("hasUnfilledShown", true);
+		} else {
 			model.addAttribute("hasUnfilled", false);
 		}
 
 		return "attendance/detail";
 	}
-	
+
 	/**
 	 * 勤怠管理画面 『出勤』ボタン押下
 	 * 
@@ -148,7 +146,6 @@ public class AttendanceController {
 		return "attendance/update";
 	}
 
-
 	/**
 	 * 勤怠情報直接変更画面 『更新』ボタン押下
 	 * 
@@ -159,45 +156,37 @@ public class AttendanceController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(path = "/update", params = "complete", method = RequestMethod.POST)
-	public String complete(@Valid AttendanceForm attendanceForm, BindingResult result, Model model)
-			throws ParseException {
-		
-		// 個別フォームのチェック
-	    for (int i = 0; i < attendanceForm.getAttendanceList().size(); i++) {
-	        DailyAttendanceForm form = attendanceForm.getAttendanceList().get(i);
-	        List<ObjectError> errors = form.validate(i, messageSource);
-	        errors.forEach(result::addError);
-	    }
+	public String complete(@Valid @ModelAttribute AttendanceForm attendanceForm,
+			BindingResult result, Model model) throws ParseException {
 
-	    // 入力チェックに引っかかった場合
-	    if (result.hasErrors()) {
-	    	String errors = result.getAllErrors().stream()
-	                .map(e -> "* " + e.getDefaultMessage())
-	                .collect(Collectors.joining("<br/>"));
-	    
-	    	model.addAttribute("error", errors);
-	        // プルダウン再設定
-	        attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
-	        attendanceForm.setHours(attendanceUtil.setHours());
-	        attendanceForm.setMinutes(attendanceUtil.setMinutes());
+		List<ObjectError> errors = studentAttendanceService.validateAttendanceForm(attendanceForm, messageSource);
+		errors.forEach(result::addError);
 
-	        model.addAttribute("attendanceForm", attendanceForm);
-	        return "attendance/update"; // 勤怠情報直接変更画面に戻す
-	    }
+		//入力チェックに引っかかった場合
+		if (!errors.isEmpty()||result.hasErrors()) {
+			// プルダウン再設定
+			attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
+			attendanceForm.setHours(attendanceUtil.setHourMap());
+			attendanceForm.setMinutes(attendanceUtil.setMinuteMap());
 
-	    // 更新処理
-	    String message = studentAttendanceService.update(attendanceForm);
-	    model.addAttribute("message", message);
+			model.addAttribute("attendanceForm", attendanceForm);
+			model.addAttribute("errors",errors);
+			// 勤怠情報直接変更画面に戻す
+			return "attendance/update";
+		}
 
-	    // 一覧再取得
-	    List<AttendanceManagementDto> attendanceManagementDtoList =
-	            studentAttendanceService.getAttendanceManagement(
-	                    loginUserDto.getCourseId(),
-	                    loginUserDto.getLmsUserId());
+		// 更新処理
+		String message = studentAttendanceService.update(attendanceForm);
+		model.addAttribute("message", message);
 
-	    model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
-	    
-	    return "attendance/detail";
+		// 一覧再取得
+		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService.getAttendanceManagement(
+				loginUserDto.getCourseId(),
+				loginUserDto.getLmsUserId());
 
-	} 
+		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
+
+		return "attendance/detail";
+	}
+
 }

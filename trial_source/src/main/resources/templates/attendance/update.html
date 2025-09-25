@@ -4,6 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>勤怠情報変更｜LMS</title>
+	
 </head>
 
 <body>
@@ -23,14 +24,17 @@
 		<div class="bs-component col-sm-12">
 
 			<form th:action="@{/attendance/update}" method="post">
-				<th:block th:if="${not #strings.isEmpty(error)}" id="error">
+				<th:block th:if="${errors != null}">
 					<ul style="padding-left: 0; list-style: none;">
-						<li><span th:utext="${error}" class="help-inline error"></span></li>
+						<li th:each="err : ${errors}">
+							<span th:text="${err.defaultMessage}" class="help-inline error"></span>
+						</li>
 					</ul>
 				</th:block>
-				
-			
-				<table class="table table-hover dataTable no-footer" style="border-collapse: collapse; table-layout: fixed; width:100%">
+
+
+				<table class="table table-hover dataTable no-footer"
+					style="border-collapse: collapse; table-layout: fixed; width:100%">
 					<thead style="display: block;">
 						<tr>
 							<th class="w140">日付</th>
@@ -42,8 +46,8 @@
 							<th class="w70">ステータス</th>
 							<th class="w210">備考</th>
 						</tr>
-					</thead>		
-				   <tbody style="display: block; overflow-y: auto; height: 280px;">
+					</thead>
+					<tbody style="display: block; overflow-y: auto; height: 280px;">
 						<th:block th:each="dailyAttendanceForm, stat : *{attendanceForm.attendanceList}">
 							<tr>
 								<th:block>
@@ -109,7 +113,7 @@
 								<td class="w80">
 									<select th:name="|attendanceList[${stat.index}].blankTime|" class="form-control">
 										<option th:each="blankTime : ${attendanceForm.blankTimes}"
-											th:value="${blankTime.key}" th:inlne="text" class="form-control"
+											th:value="${blankTime.key}" th:inline="text" class="form-control"
 											th:selected="${blankTime.key == dailyAttendanceForm.blankTime}">
 											[[${blankTime.value}]]</option>
 									</select>
@@ -123,7 +127,7 @@
 						</th:block>
 					</tbody>
 				</table>
-				
+
 
 				<div class="form-group">
 					<th:block th:if="${session.loginUserDto.role == '0001'}">
@@ -149,12 +153,12 @@
 			const row = button.closest("tr");
 
 			//出勤時間(9:00)
-			row.querySelector(".start-hour").value = "09";
-			row.querySelector(".start-minute").value = "00";
+			row.querySelector(".start-hour").value = 9;
+			row.querySelector(".start-minute").value = 0;
 
 			//退勤時間(18:00)
-			row.querySelector(".end-hour").value = "18";
-			row.querySelector(".end-minute").value = "00";
+			row.querySelector(".end-hour").value = 18;
+			row.querySelector(".end-minute").value = 0;
 		}
 
 	</script>

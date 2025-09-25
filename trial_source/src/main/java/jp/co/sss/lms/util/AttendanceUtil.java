@@ -149,14 +149,14 @@ public class AttendanceUtil {
 	/**
 	 * 時間プルダウン
 	 * 
-	 * @return 時間
+	 * @return 時間マップ
 	 */
-	public LinkedHashMap<String, String>setHours(){
-		LinkedHashMap<String, String>map = new LinkedHashMap<>();
-		map.put("", "");
+	public LinkedHashMap<Integer, String>setHourMap(){
+		LinkedHashMap<Integer, String>map = new LinkedHashMap<>();
+		map.put(null, "");
 		for(int i = 0; i < 24; i++) {
-			String val = String.format("%02d", i);
-			map.put(val, val);
+			String label = String.format("%02d", i);
+			map.put(i, label);
 		}
 		return map;
 	}
@@ -165,12 +165,12 @@ public class AttendanceUtil {
 	 * 
 	 * @return 分
 	 */
-	public LinkedHashMap<String, String>setMinutes(){
-		LinkedHashMap<String, String> map = new LinkedHashMap<>();
-		map.put("","");
+	public LinkedHashMap<Integer, String>setMinuteMap(){
+		LinkedHashMap<Integer, String> map = new LinkedHashMap<>();
+		map.put(null,"");
 		for(int i = 0; i< 60; i++) {
-			String val = String.format("%02d", i);
-			map.put(val,val);
+			String label = String.format("%02d", i);
+			map.put(i,label);
 		}
 		return map;
 		

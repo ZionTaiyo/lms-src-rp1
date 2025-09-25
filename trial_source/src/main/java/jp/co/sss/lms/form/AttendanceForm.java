@@ -34,9 +34,9 @@ public class AttendanceForm {
 	@Valid
 	private List<DailyAttendanceForm> attendanceList;
 	/** 時間プルダウン */
-	private LinkedHashMap<String, String> hours;
+	private LinkedHashMap<Integer, String> hours;
 	/** 分プルダウン */
-	private LinkedHashMap<String, String> minutes;
+	private LinkedHashMap<Integer, String> minutes;
 	
 
 }

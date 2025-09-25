@@ -19,12 +19,12 @@
 			AND delete_flg = #{deleteFlg}
 	</select>
 	
-	<select id="countUnfilledPastAttendance" resultType="int">
+	<select id="notEnterCount" resultType="int">
     SELECT COUNT(*)
     FROM t_student_attendance sa
     WHERE sa.lms_user_id = #{lmsUserId}
       AND sa.delete_flg  = #{deleteFlg}
-      AND sa.training_date &lt; #{trainingDate}
+      AND sa.training_date &lt; #{trainingDate,jdbcType=DATE}
       AND sa.status != 1
       AND (
             sa.training_start_time IS NULL OR TRIM(sa.training_start_time) = ''
