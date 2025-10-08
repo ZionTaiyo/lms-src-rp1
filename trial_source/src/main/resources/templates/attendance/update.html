@@ -27,7 +27,7 @@
 				<th:block th:if="${errors != null}">
 					<ul style="padding-left: 0; list-style: none;">
 						<li th:each="err : ${errors}">
-							<span th:text="${err.defaultMessage}" class="help-inline error"></span>
+							<span class="help-inline error">*<span th:text="${err.defaultMessage}"></span></span>
 						</li>
 					</ul>
 				</th:block>

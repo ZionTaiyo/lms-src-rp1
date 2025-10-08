@@ -1,6 +1,7 @@
 package jp.co.sss.lms.controller;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -170,7 +171,10 @@ public class AttendanceController {
 			attendanceForm.setMinutes(attendanceUtil.setMinuteMap());
 
 			model.addAttribute("attendanceForm", attendanceForm);
-			model.addAttribute("errors",errors);
+			
+			List<ObjectError>allErrors = new ArrayList<>(errors);
+			allErrors.addAll(result.getAllErrors());
+			model.addAttribute("errors",allErrors);
 			// 勤怠情報直接変更画面に戻す
 			return "attendance/update";
 		}

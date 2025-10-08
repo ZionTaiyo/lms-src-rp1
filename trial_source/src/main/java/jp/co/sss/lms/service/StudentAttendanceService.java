@@ -82,7 +82,7 @@ public class StudentAttendanceService {
 	 * @param lmsUserId
 	 * @param deleteFlg
 	 * @param trainingDate
-	 * @return 勤怠情報（受講生）テーブルマッパー
+	 * @return 勤怠未入力情報の有無
 	 */
 	public boolean hasUnfilledPastAttendance(int lmsUserId, short deleteFlg, Date trainingDate) {
 		return tStudentAttendanceMapper.notEnterCount(lmsUserId, deleteFlg, trainingDate) > 0;
